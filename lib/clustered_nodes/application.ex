@@ -7,6 +7,8 @@ defmodule ClusteredNodes.Application do
 
   @impl true
   def start(_type, _args) do
+    topologies = Application.get_env(:libcluster, :topologies) || []
+
     children = [
       ClusteredNodesWeb.Telemetry,
       ClusteredNodes.Repo,
@@ -16,6 +18,7 @@ defmodule ClusteredNodes.Application do
       {Finch, name: ClusteredNodes.Finch},
       # Start a worker by calling: ClusteredNodes.Worker.start_link(arg)
       # {ClusteredNodes.Worker, arg},
+      {Cluster.Supervisor, [topologies, [name: ClusteredNodes.ClusterSupervisor]]},
       # Start to serve requests, typically the last entry
       ClusteredNodesWeb.Endpoint
     ]
