@@ -57,3 +57,64 @@ clustered_nodes_dev=# NOTIFY test_channel, 'test';
 NOTIFY
 clustered_nodes_dev=# 
 ```
+
+
+## With Highlander
+
+Outcome: `Node2` takes the leadership over the `PsqlListener`. In case of failover, the `Node1` is taking the leadership over the `PsqlListener`, with init state.
+
+In `application.ex`
+
+```elixir
+{Highlander, {ClusteredNodes.PsqlListener, []}},
+```
+
+Node1
+```elixir
+clustered_nodes % iex --sname node1 -S mix phx.server
+Erlang/OTP 27 [erts-15.0.1] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1] [jit]
+
+[debug] Starting Highlander with ClusteredNodes.PsqlListener as uniqueness key
+[info] starting psql listener
+[info] Running ClusteredNodesWeb.Endpoint with Bandit 1.6.11 at 127.0.0.1:4000 (http)
+[info] Access ClusteredNodesWeb.Endpoint at http://localhost:4000
+Interactive Elixir (1.17.2) - press Ctrl+C to exit (type h() ENTER for help)
+[watch] build finished, watching for changes...
+
+Rebuilding...
+
+Done in 147ms.
+[info] [libcluster:local_gossip] connected to :"node2@Mateuszs-MacBook-Pro-2"
+[info] global: Name conflict terminating {Swoosh.Adapters.Local.Storage.Memory, #PID<27007.272.0>}
+
+iex(node1@Mateuszs-MacBook-Pro-2)1> 
+```
+
+Node2
+```elixir
+clustered_nodes % iex --sname node2 -S mix phx.server
+Erlang/OTP 27 [erts-15.0.1] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1] [jit]
+
+[debug] Starting Highlander with ClusteredNodes.PsqlListener as uniqueness key
+[info] starting psql listener
+[info] Running ClusteredNodesWeb.Endpoint with Bandit 1.6.11 at 127.0.0.1:4001 (http)
+[info] Access ClusteredNodesWeb.Endpoint at http://localhost:4001
+Interactive Elixir (1.17.2) - press Ctrl+C to exit (type h() ENTER for help)
+[watch] build finished, watching for changes...
+
+Rebuilding...
+
+Done in 160ms.
+[info] Received message: {:notification, #PID<0.319.0>, #Reference<0.3386486655.1405353986.43614>, "test_channel", "test"}, with state: %{counter: 0}
+[info] Received message: {:notification, #PID<0.319.0>, #Reference<0.3386486655.1405353986.43614>, "test_channel", "test"}, with state: %{counter: 1}
+iex(node2@Mateuszs-MacBook-Pro-2)1
+```
+
+Node2 failure: 
+
+Node1
+```elixir
+[info] starting psql listener
+[info] Received message: {:notification, #PID<0.656.0>, #Reference<0.2330458113.4090232835.239167>, "test_channel", "test"}, with state: %{counter: 0}
+iex(node1@Mateuszs-MacBook-Pro-2)1> 
+```
