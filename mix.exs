@@ -35,7 +35,6 @@ defmodule ClusteredNodes.MixProject do
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.10"},
-      {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       # TODO bump on release to {:phoenix_live_view, "~> 1.0.0"},
@@ -59,7 +58,8 @@ defmodule ClusteredNodes.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      {:libcluster, "~> 3.5"}
+      {:libcluster, "~> 3.5"},
+      {:postgrex, "~> 0.20.0"}
     ]
   end
 
