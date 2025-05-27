@@ -5,15 +5,17 @@ defmodule ClusteredNodes.Application do
 
   use Application
 
+  import Cachex.Spec
+
   @impl true
   def start(_type, _args) do
     topologies = Application.get_env(:libcluster, :topologies) || []
 
-    pogo_opts = [
-      name: ClusteredNodes.DistributedSupervisor,
-      scope: :clustered_nodes,
-      children: [{ClusteredNodes.PsqlListener, "psql-listener"}]
-    ]
+    # pogo_opts = [
+    #   name: ClusteredNodes.DistributedSupervisor,
+    #   scope: :clustered_nodes,
+    #   children: [{ClusteredNodes.PsqlListener, "psql-listener"}]
+    # ]
 
     children = [
       ClusteredNodesWeb.Telemetry,
@@ -27,13 +29,19 @@ defmodule ClusteredNodes.Application do
       {Cluster.Supervisor, [topologies, [name: ClusteredNodes.ClusterSupervisor]]},
 
       ## Highlander
-      # {Highlander, {ClusteredNodes.PsqlListener, []}},
+      {Highlander, {ClusteredNodes.PsqlListener, []}},
 
       ## Pogo
-      {Pogo.DynamicSupervisor, pogo_opts},
+      # {Pogo.DynamicSupervisor, pogo_opts},
       # Start to serve requests, typically the last entry
       ClusteredNodesWeb.Endpoint
     ]
+
+    Cachex.start(:persistence, [
+      router: router(module: Cachex.Router.Ring, options: [
+        monitor: true
+      ])
+    ])
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

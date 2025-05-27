@@ -14,14 +14,24 @@ defmodule ClusteredNodes.PsqlListener do
     {:ok, pid} = Postgrex.Notifications.start_link(ClusteredNodes.Repo.config())
     {:ok, _ref} = Postgrex.Notifications.listen(pid, "test_channel")
 
-    {:ok, %{counter: 0}}
+    # maybe get the latest state
+    case Cachex.get(:persistence, :counter) do
+      {:ok, nil} -> {:ok, %{counter: 0}}
+      {:ok, counter} -> {:ok, %{counter: counter}}
+    end
   end
 
   @impl true
   def handle_info(message, state) do
     Logger.info("Received message: #{inspect(message)}, with state: #{inspect(state)}")
 
-    ## update counte
-    {:noreply, %{state | counter: state.counter + 1}}
+    ## update counter state
+    state = %{state | counter: state.counter + 1}
+
+    # cache latest state
+    {:ok, true} = Cachex.put(:persistence, :counter, state.counter)
+
+    # return state
+    {:noreply, state}
   end
 end
