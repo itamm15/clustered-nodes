@@ -19,7 +19,7 @@ defmodule ClusteredNodes.Application do
       # Start a worker by calling: ClusteredNodes.Worker.start_link(arg)
       # {ClusteredNodes.Worker, arg},
       {Cluster.Supervisor, [topologies, [name: ClusteredNodes.ClusterSupervisor]]},
-      {ClusteredNodes.PsqlListener, []},
+      {Highlander, {ClusteredNodes.PsqlListener, []}},
       # Start to serve requests, typically the last entry
       ClusteredNodesWeb.Endpoint
     ]

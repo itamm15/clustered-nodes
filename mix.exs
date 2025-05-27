@@ -59,7 +59,8 @@ defmodule ClusteredNodes.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:libcluster, "~> 3.5"},
-      {:postgrex, "~> 0.20.0"}
+      {:postgrex, "~> 0.20.0"},
+      {:highlander, "~> 0.2.1"}
     ]
   end
 
