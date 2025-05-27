@@ -60,7 +60,8 @@ defmodule ClusteredNodes.MixProject do
       {:bandit, "~> 1.5"},
       {:libcluster, "~> 3.5"},
       {:postgrex, "~> 0.20.0"},
-      {:highlander, "~> 0.2.1"}
+      {:highlander, "~> 0.2.1"},
+      {:pogo, "~> 0.3.0"}
     ]
   end
 

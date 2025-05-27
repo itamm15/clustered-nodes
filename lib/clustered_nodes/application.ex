@@ -9,6 +9,12 @@ defmodule ClusteredNodes.Application do
   def start(_type, _args) do
     topologies = Application.get_env(:libcluster, :topologies) || []
 
+    pogo_opts = [
+      name: ClusteredNodes.DistributedSupervisor,
+      scope: :clustered_nodes,
+      children: [{ClusteredNodes.PsqlListener, "psql-listener"}]
+    ]
+
     children = [
       ClusteredNodesWeb.Telemetry,
       ClusteredNodes.Repo,
@@ -19,7 +25,12 @@ defmodule ClusteredNodes.Application do
       # Start a worker by calling: ClusteredNodes.Worker.start_link(arg)
       # {ClusteredNodes.Worker, arg},
       {Cluster.Supervisor, [topologies, [name: ClusteredNodes.ClusterSupervisor]]},
-      {Highlander, {ClusteredNodes.PsqlListener, []}},
+
+      ## Highlander
+      # {Highlander, {ClusteredNodes.PsqlListener, []}},
+
+      ## Pogo
+      {Pogo.DynamicSupervisor, pogo_opts},
       # Start to serve requests, typically the last entry
       ClusteredNodesWeb.Endpoint
     ]

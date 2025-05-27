@@ -118,3 +118,8 @@ Node1
 [info] Received message: {:notification, #PID<0.656.0>, #Reference<0.2330458113.4090232835.239167>, "test_channel", "test"}, with state: %{counter: 0}
 iex(node1@Mateuszs-MacBook-Pro-2)1> 
 ```
+
+
+## With Pogo
+
+The outcome of Pogo is the same as the outcome of Highlander.
